@@ -127,7 +127,7 @@ void *list_get(list *l, size_t idx)
     return current->data;
 }
 
-void pop(list *l)
+void list_pop(list *l)
 {
     list_remove(l, l->len - 1);
 }
@@ -161,9 +161,10 @@ void print_str(void *item)
 
 
 void test(void);
+void intense_test(void);
 int main(void)
 {   
-    test();
+    intense_test();
     return 0;    
 }   
 
@@ -177,4 +178,59 @@ void test(void)
     list_print(l, print_int);
 
     list_destroy(l);
+}
+
+void intense_test(void) {
+    list *l = list_init(int);
+    int n = 100000; // Number of operations for stress test
+    int *numbers = (int *)malloc(n * sizeof(int));
+
+    // Initialize numbers array
+    for (int i = 0; i < n; i++) {
+        numbers[i] = i;
+    }
+
+    // Stress test appending
+    printf("Stress test: Appending %d elements\n", n);
+    for (int i = 0; i < n; i++) {
+        list_append(l, &numbers[i]);
+    }
+
+    // Stress test prepending
+    // printf("Stress test: Prepending %d elements\n", n);
+    // for (int i = 0; i < n; i++) {
+    //     list_prepend(l, &numbers[i]);
+    // }
+
+    // Stress test random access
+    printf("Stress test: Random access of %d elements\n", n);
+    for (int i = 0; i < n; i++) {
+        int idx = rand() % l->len;
+        int *value = (int *)list_get(l, idx);
+        if (i % (n / 10) == 0) {
+            printf("Accessed value at index %d: %d\n", idx, *value);
+        }
+    }
+
+    // Stress test random removals
+    printf("Stress test: Random removals of %d elements\n", n);
+    for (int i = 0; i < n; i++) {
+        if (l->len == 0) break; 
+        int idx = rand() % l->len;
+        list_remove(l, idx);
+    }
+
+    // Ensure list is empty before finishing
+    while (!is_list_empty(l)) {
+        list_pop(l);
+    }
+
+    printf("Stress test completed.\n");
+
+    list_destroy(l);
+    free(numbers);
+
+    /* TEST RESULT: (OVER TIME FOR PERFORMANCE COMPARISONS TO ACHIEVE ITERATIVE DEVELOPMENT)
+        - 1st Implementation: 25.84s user 0.05s system 99% cpu 25.942 total 
+    */
 }
