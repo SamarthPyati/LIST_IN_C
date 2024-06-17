@@ -57,6 +57,8 @@ node *create_node(void *data);
 int is_list_empty(list *l);
 void list_append(list *l, void *data);
 void list_prepend(list *l, void *data);
+void list_insert(list *l, size_t idx, void *key);
+void *list_search(list *l, void *key);
 void list_print(list *l, void (*print_item)(void *));
 void list_destroy(list *l);
 void list_remove(list *l, size_t idx);

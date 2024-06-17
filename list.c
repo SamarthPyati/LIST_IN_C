@@ -77,6 +77,47 @@ void list_prepend(list *l, void *data)
     l->len++;
 }
 
+void list_insert(list *l, size_t idx, void *key)
+{   
+    if (idx < 0 || idx > l->len)
+        HANDLE_ERR_V("LIST_IDX_OUT_OF_BOUNDS", "index provided (%zu) is out of bounds of list (length: %zu)", idx, l->len);
+
+    if (idx == 0)
+    {
+        list_prepend(l, key);
+    }
+    else 
+    {   
+        node *new = create_node(key);
+        node *current = l->head;
+        node *prev = NULL;
+        size_t t = 0;       // target index
+        while (current != NULL && t != idx)
+        {   
+            prev = current;
+            current = current->next;
+            t++;
+        }
+
+        if (current == NULL)
+        {
+            list_append(l, key);
+        }
+        prev->next = new;
+        new->next = current;
+    }
+}
+
+void *list_search(list *l, void *key)
+{
+    node *current = l->head;
+    while (current != NULL && current->data != key)
+    {
+        current = current->next;
+    }
+    return current;
+}
+
 void list_remove(list *l, size_t idx)
 {   
     // support for reverse indexing 
@@ -164,7 +205,7 @@ void test(void);
 void intense_test(void);
 int main(void)
 {   
-    intense_test();
+    test();
     return 0;    
 }   
 
@@ -176,7 +217,9 @@ void test(void)
     int numbers[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
     list_map_items(l, numbers);
     list_print(l, print_int);
-
+    list_insert(l, 10, 6969);
+    node *search_node = list_search(l, 6969);
+    printf("SEARCH NODE VAL: %d\n", search_node->data);
     list_destroy(l);
 }
 
